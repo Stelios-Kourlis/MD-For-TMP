@@ -22,6 +22,7 @@ public class MarkdownToTMPConverter : MonoBehaviour, IPointerClickHandler
     private ConvertionLogger Logger => gameObject.GetComponent<ConvertionLogger>();
     public string CodeFontName => codeFont != null ? codeFont.name : "Consolas SDF";
     public string CodeFontColorHex => '#' + ColorUtility.ToHtmlStringRGBA(codeBackgroundColor);
+    public string HighlightedTextBackgroundColorHex => '#' + ColorUtility.ToHtmlStringRGBA(highlightedTextBackgroundColor);
 
 
     private int lastHash = 0;
@@ -32,6 +33,7 @@ public class MarkdownToTMPConverter : MonoBehaviour, IPointerClickHandler
     [SerializeField] private bool autoConvertOnChange = true;
     [SerializeField] private TMP_FontAsset codeFont;
     [SerializeField] private Color codeBackgroundColor;
+    [SerializeField] private Color highlightedTextBackgroundColor;
 
 
     void OnEnable()
@@ -62,6 +64,7 @@ public class MarkdownToTMPConverter : MonoBehaviour, IPointerClickHandler
             if (LastSymbol.Symbol == "\\")
             {
                 markupSymbols.Remove(LastSymbol);
+                convertedText.AppendToLatestStringInList(letter);
                 continue;
             }
 
@@ -157,7 +160,7 @@ public class MarkdownToTMPConverter : MonoBehaviour, IPointerClickHandler
                     else convertedText.AppendToLatestStringInList(")");
                     break;
                 case '~':
-                    if (markupSymbols.AddOrJoin(new MarkupSymbol("~"), 2))
+                    if (markupSymbols.AddOrJoin(new MarkupSymbol("~"), 3))
                         ReplaceLatestSymbol();
                     break;
                 case '^':
@@ -289,6 +292,14 @@ public class MarkdownToTMPConverter : MonoBehaviour, IPointerClickHandler
             {
                 convertedText.AppendToLatestStringInList("</sub>");
                 int index = markupSymbols.FindLastIndex(s => s.Symbol == "~");
+                if (index != -1)
+                    markupSymbols.RemoveAt(index);
+            }
+
+            if (markupSymbols.Any(s => s.Symbol == "~~~")) //Close subscript
+            {
+                convertedText.AppendToLatestStringInList("</u>");
+                int index = markupSymbols.FindLastIndex(s => s.Symbol == "~~~");
                 if (index != -1)
                     markupSymbols.RemoveAt(index);
             }
@@ -524,6 +535,21 @@ public class MarkdownToTMPConverter : MonoBehaviour, IPointerClickHandler
                         markupSymbols.RemoveAt(index);
                 }
                 break;
+            case "~~~":
+                if (mds.IsOpener)
+                {
+                    convertedText.AppendToLatestStringInList("<u>");
+                    mds.IsReplaced = true;
+                }
+                else
+                {
+                    convertedText.AppendToLatestStringInList("</u>");
+                    markupSymbols.Remove(mds);
+                    int index = markupSymbols.FindLastIndex(s => s.Symbol == "~~~");
+                    if (index != -1)
+                        markupSymbols.RemoveAt(index);
+                }
+                break;
             case "^":
                 if (mds.IsOpener)
                 {
@@ -539,6 +565,22 @@ public class MarkdownToTMPConverter : MonoBehaviour, IPointerClickHandler
                         markupSymbols.RemoveAt(index);
                 }
                 break;
+            case "==":
+                if (mds.IsOpener)
+                {
+                    convertedText.AppendToLatestStringInList($"<mark={HighlightedTextBackgroundColorHex}>");
+                    mds.IsReplaced = true;
+                }
+                else
+                {
+                    convertedText.AppendToLatestStringInList("</mark>");
+                    markupSymbols.Remove(mds);
+                    int index = markupSymbols.FindLastIndex(s => s.Symbol == "^");
+                    if (index != -1)
+                        markupSymbols.RemoveAt(index);
+                }
+                break;
+
 
         }
     }

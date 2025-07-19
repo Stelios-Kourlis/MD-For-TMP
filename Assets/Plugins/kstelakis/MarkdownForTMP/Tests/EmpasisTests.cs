@@ -8,6 +8,7 @@ public class EmpasisTests
 {
     private static TMP_Text tmp;
     private static GameObject go;
+    private static string HighlightedTextBackgroundColorHex => go.GetComponent<MarkdownToTMPConverter>().HighlightedTextBackgroundColorHex;
 
     [OneTimeSetUp] // Runs once before all tests
     public void Setup()
@@ -129,7 +130,7 @@ public class EmpasisTests
     {
         tmp.text = "H~2~O";
         yield return null;
-        Assert.AreEqual("H<sub>2</sub>O", tmp.text, "Subscript text should be converted to sub tags");
+        Assert.AreEqual("H<sub>2</sub>O", tmp.text, "Subscript text should be converted to sub tags  and closed automatically");
     }
 
     [UnityTest]
@@ -137,6 +138,38 @@ public class EmpasisTests
     {
         tmp.text = "H~2O";
         yield return null;
-        Assert.AreEqual("H<sub>2O</sub>", tmp.text, "Unclosed Subscript text should be converted to sub tags");
+        Assert.AreEqual("H<sub>2O</sub>", tmp.text, "Unclosed Subscript text should be converted to sub tags  and closed automatically");
+    }
+
+    [UnityTest]
+    public IEnumerator TestUnderlined()
+    {
+        tmp.text = "~~~dummy link~~~";
+        yield return null;
+        Assert.AreEqual("<u>dummy link</u>", tmp.text, "Triple tildes should be converted to underline tags");
+    }
+
+    [UnityTest]
+    public IEnumerator TestUnclosedUnderlined()
+    {
+        tmp.text = "~~~dummy link";
+        yield return null;
+        Assert.AreEqual("<u>dummy link</u>", tmp.text, "Unclosed Triple tildes should be converted to underline tags and closed automatically");
+    }
+
+    [UnityTest]
+    public IEnumerator TestHighlight()
+    {
+        tmp.text = "==fancy==";
+        yield return null;
+        Assert.AreEqual($"<mark={HighlightedTextBackgroundColorHex}>fancy</mark>", tmp.text, "== should be converted to highlight tags with the correct background color");
+    }
+
+    [UnityTest]
+    public IEnumerator TestUnclosedHighlight()
+    {
+        tmp.text = "==fancy";
+        yield return null;
+        Assert.AreEqual("<mark={HighlightedTextBackgroundColorHex}>fancy</mark>", tmp.text, "Unclosed == should be converted to highlight tags with the correct background color and closed automatically");
     }
 }
