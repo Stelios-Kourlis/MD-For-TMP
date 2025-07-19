@@ -304,6 +304,14 @@ namespace kstelakis.MarkdownForTMP
                     if (index != -1)
                         markupSymbols.RemoveAt(index);
                 }
+
+                if (markupSymbols.Any(s => s.Symbol == "==")) //Close highlighted text
+                {
+                    convertedText.AppendToLatestStringInList("</mark>");
+                    int index = markupSymbols.FindLastIndex(s => s.Symbol == "==");
+                    if (index != -1)
+                        markupSymbols.RemoveAt(index);
+                }
             }
 
             ReplaceLatestSymbol();

@@ -184,7 +184,7 @@ namespace kstelakis.MarkdownForTMP
         {
             tmp.text = "==fancy";
             yield return null;
-            Assert.AreEqual("<mark={HighlightedTextBackgroundColorHex}>fancy</mark>", tmp.text, "Unclosed == should be converted to highlight tags with the correct background color and closed automatically");
+            Assert.AreEqual($"<mark={HighlightedTextBackgroundColorHex}>fancy</mark>", tmp.text, "Unclosed == should be converted to highlight tags with the correct background color and closed automatically");
         }
     }
 }
