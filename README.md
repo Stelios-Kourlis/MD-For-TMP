@@ -36,6 +36,10 @@ The parser is based of the [Markdown Cheat Sheet](https://www.markdownguide.org/
 * Task List
 * Emojis (Unless implemented as Images)
 
+## Requirements
+Your project should already have the 2D Sprites and Unity UI packages
+You should already have install TMP Essentials
+
 ## Installing
 Just download the .unitypackage and import it to your project. Import all the files it asks for. Then add a MarkdownFormatter component to a game object that has TMP components on it
 
