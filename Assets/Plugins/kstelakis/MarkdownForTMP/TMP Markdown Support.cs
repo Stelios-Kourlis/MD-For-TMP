@@ -59,6 +59,12 @@ public class MarkdownToTMPConverter : MonoBehaviour, IPointerClickHandler
         int index = 0;
         foreach (char letter in MarkdownText)
         {
+            if (LastSymbol.Symbol == "\\")
+            {
+                markupSymbols.Remove(LastSymbol);
+                continue;
+            }
+
             if (LastSymbol.Symbol.Contains("`") && letter != '`' && letter != '\n')
             {
                 ReplaceLatestSymbol();
@@ -149,6 +155,17 @@ public class MarkdownToTMPConverter : MonoBehaviour, IPointerClickHandler
                 case ')':
                     if (LastSymbol.Symbol == "![](" || LastSymbol.Symbol == "[](") LastSymbol.Symbol += ")";
                     else convertedText.AppendToLatestStringInList(")");
+                    break;
+                case '~':
+                    if (markupSymbols.AddOrJoin(new MarkupSymbol("~"), 2))
+                        ReplaceLatestSymbol();
+                    break;
+                case '^':
+                    markupSymbols.AddOrJoin(new MarkupSymbol("^"));
+                    ReplaceLatestSymbol();
+                    break;
+                case '\\':
+                    markupSymbols.AddOrJoin(new MarkupSymbol("\\"));
                     break;
                 default:
                     ReplaceLatestSymbol();
@@ -243,7 +260,7 @@ public class MarkdownToTMPConverter : MonoBehaviour, IPointerClickHandler
                     markupSymbols.RemoveAt(index);
             }
 
-            if (markupSymbols.Any(s => s.Symbol == "***" && s.IsReplaced)) //Close bold
+            if (markupSymbols.Any(s => s.Symbol == "***" && s.IsReplaced)) //Close both
             {
                 convertedText.AppendToLatestStringInList("</b></i>");
                 int index = markupSymbols.FindLastIndex(s => s.Symbol == "***");
@@ -256,6 +273,30 @@ public class MarkdownToTMPConverter : MonoBehaviour, IPointerClickHandler
             {
                 convertedText.AppendToLatestStringInList("</font></mark>");
                 int index = markupSymbols.FindLastIndex(s => s.Symbol == "```");
+                if (index != -1)
+                    markupSymbols.RemoveAt(index);
+            }
+
+            if (markupSymbols.Any(s => s.Symbol == "~~")) //Close strikethrough
+            {
+                convertedText.AppendToLatestStringInList("</s>");
+                int index = markupSymbols.FindLastIndex(s => s.Symbol == "~~");
+                if (index != -1)
+                    markupSymbols.RemoveAt(index);
+            }
+
+            if (markupSymbols.Any(s => s.Symbol == "~")) //Close subscript
+            {
+                convertedText.AppendToLatestStringInList("</sub>");
+                int index = markupSymbols.FindLastIndex(s => s.Symbol == "~");
+                if (index != -1)
+                    markupSymbols.RemoveAt(index);
+            }
+
+            if (markupSymbols.Any(s => s.Symbol == "^")) //Close superscript
+            {
+                convertedText.AppendToLatestStringInList("</sup>");
+                int index = markupSymbols.FindLastIndex(s => s.Symbol == "^");
                 if (index != -1)
                     markupSymbols.RemoveAt(index);
             }
@@ -429,7 +470,7 @@ public class MarkdownToTMPConverter : MonoBehaviour, IPointerClickHandler
                 {
                     convertedText.AppendToLatestStringInList("</font></mark>");
                     markupSymbols.Remove(mds);
-                    int index = markupSymbols.FindLastIndex(s => s.Symbol.Contains("`"));
+                    int index = markupSymbols.FindLastIndex(s => s.Symbol == "`");
                     if (index != -1)
                         markupSymbols.RemoveAt(index);
                 }
@@ -453,6 +494,52 @@ public class MarkdownToTMPConverter : MonoBehaviour, IPointerClickHandler
                 currentParenthesisText = string.Empty;
                 markupSymbols.Remove(mds);
                 break;
+            case "~":
+                if (mds.IsOpener)
+                {
+                    convertedText.AppendToLatestStringInList("<sub>");
+                    mds.IsReplaced = true;
+                }
+                else
+                {
+                    convertedText.AppendToLatestStringInList("</sub>");
+                    markupSymbols.Remove(mds);
+                    int index = markupSymbols.FindLastIndex(s => s.Symbol == "~");
+                    if (index != -1)
+                        markupSymbols.RemoveAt(index);
+                }
+                break;
+            case "~~":
+                if (mds.IsOpener)
+                {
+                    convertedText.AppendToLatestStringInList("<s>");
+                    mds.IsReplaced = true;
+                }
+                else
+                {
+                    convertedText.AppendToLatestStringInList("</s>");
+                    markupSymbols.Remove(mds);
+                    int index = markupSymbols.FindLastIndex(s => s.Symbol == "~~");
+                    if (index != -1)
+                        markupSymbols.RemoveAt(index);
+                }
+                break;
+            case "^":
+                if (mds.IsOpener)
+                {
+                    convertedText.AppendToLatestStringInList("<sup>");
+                    mds.IsReplaced = true;
+                }
+                else
+                {
+                    convertedText.AppendToLatestStringInList("</sup>");
+                    markupSymbols.Remove(mds);
+                    int index = markupSymbols.FindLastIndex(s => s.Symbol == "^");
+                    if (index != -1)
+                        markupSymbols.RemoveAt(index);
+                }
+                break;
+
         }
     }
 

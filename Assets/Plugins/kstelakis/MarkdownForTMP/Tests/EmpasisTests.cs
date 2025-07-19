@@ -91,4 +91,52 @@ public class EmpasisTests
         yield return null;
         Assert.AreEqual("<i>Unclosed <b>Bold and Italic Text</i></b>", tmp.text, "Unclosed mixed text should be closed automatically");
     }
+
+    [UnityTest]
+    public IEnumerator TestStrikethrough()
+    {
+        tmp.text = "~~ Strikethrough Text ~~";
+        yield return null;
+        Assert.AreEqual("<s> Strikethrough Text </s>", tmp.text, "Strikethrough text should be converted to s tags");
+    }
+
+    [UnityTest]
+    public IEnumerator TestUnclosedStrikethrough()
+    {
+        tmp.text = "~~ Strikethrough Text";
+        yield return null;
+        Assert.AreEqual("<s> Strikethrough Text</s>", tmp.text, "Unclosed Strikethrough text should be converted to s tags");
+    }
+
+    [UnityTest]
+    public IEnumerator TestSuperscript()
+    {
+        tmp.text = "y = x^2^";
+        yield return null;
+        Assert.AreEqual("y = x<sup>2</sup>", tmp.text, "Superscript should be converted to sup tags");
+    }
+
+    [UnityTest]
+    public IEnumerator TestUnclosedSuperscript()
+    {
+        tmp.text = "y = x^2";
+        yield return null;
+        Assert.AreEqual("y = x<sup>2</sup>", tmp.text, "Unclosed Superscript should be converted to sup tags");
+    }
+
+    [UnityTest]
+    public IEnumerator TestSubscript()
+    {
+        tmp.text = "H~2~O";
+        yield return null;
+        Assert.AreEqual("H<sub>2</sub>O", tmp.text, "Subscript text should be converted to sub tags");
+    }
+
+    [UnityTest]
+    public IEnumerator TestUnclosedSubscript()
+    {
+        tmp.text = "H~2O";
+        yield return null;
+        Assert.AreEqual("H<sub>2O</sub>", tmp.text, "Unclosed Subscript text should be converted to sub tags");
+    }
 }
