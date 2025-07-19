@@ -29,7 +29,7 @@ public class ImagesTests
     [UnityTest]
     public IEnumerator TestImage()
     {
-        tmp.text = "![TMP Markdown Support Icon]";
+        tmp.text = "![TMP Markdown Support Icon]()";
         yield return null;
         Assert.AreEqual($"<sprite=\"TMP Markdown Support Icon\" index=0>", tmp.text, "Image should be converted to sprite tag with index 0");
     }
@@ -40,5 +40,29 @@ public class ImagesTests
         tmp.text = "![TMP Markdown Support Icon";
         yield return null;
         Assert.AreEqual($"![TMP Markdown Support Icon", tmp.text, "Unclosed image should be treated as literal text");
+    }
+
+    [UnityTest]
+    public IEnumerator TestImageWithoutFallbackText()
+    {
+        tmp.text = "![TMP Markdown Support Icon]";
+        yield return null;
+        Assert.AreEqual($"<sprite=\"TMP Markdown Support Icon\" index=0>", tmp.text, "Images without fallback text should still be converted to sprite tag with index 0");
+    }
+
+    [UnityTest]
+    public IEnumerator TestNonExistingImageWithFallbackText()
+    {
+        tmp.text = "![B](oops!)";
+        yield return null;
+        Assert.AreEqual($"oops!", tmp.text, "Non-existing image with fallback text should be converted to the fallback text");
+    }
+
+    [UnityTest]
+    public IEnumerator TestNonExistingImageWithoutFallbackText()
+    {
+        tmp.text = "![B]";
+        yield return null;
+        Assert.AreEqual($"<sprite=\"B\" index=0>", tmp.text, "Non-existing image with fallback text should be converted to the fallback text");
     }
 }

@@ -7,12 +7,13 @@ using System.Text.RegularExpressions;
 using TMPro;
 using UnityEditor;
 using UnityEngine;
+using UnityEngine.EventSystems;
 
 // namespace kstelakis.MarkdownForTMP
 // {
 
 [RequireComponent(typeof(TMP_Text))]
-public class MarkdownToTMPConverter : MonoBehaviour
+public class MarkdownToTMPConverter : MonoBehaviour, IPointerClickHandler
 {
     private string MarkdownText => '\n' + gameObject.GetComponent<TMP_Text>().text;
     private int CurrentHashedText => MarkdownText.GetHashCode();
@@ -26,8 +27,9 @@ public class MarkdownToTMPConverter : MonoBehaviour
     private int lastHash = 0;
     private readonly List<MarkupSymbol> markupSymbols = new();
     private readonly List<string> convertedText = new();
-    private string currentImageName = string.Empty;
+    private string currentBracketText = string.Empty, currentParenthesisText = string.Empty;
 
+    [SerializeField] private bool autoConvertOnChange = true;
     [SerializeField] private TMP_FontAsset codeFont;
     [SerializeField] private Color codeBackgroundColor;
 
@@ -39,6 +41,8 @@ public class MarkdownToTMPConverter : MonoBehaviour
 
     void Update()
     {
+        if (!autoConvertOnChange) return;
+
         if (lastHash != CurrentHashedText)
         {
             if (HasLoggerAttached) Logger.Log(ConvertionLogger.LogType.Info, "TMP_Text updated");
@@ -62,11 +66,20 @@ public class MarkdownToTMPConverter : MonoBehaviour
                 continue;
             }
 
-            if (LastSymbol.Symbol == "![" && letter != ']')
+            if ((LastSymbol.Symbol == "![" || LastSymbol.Symbol == "[") && letter != ']')
             {
-                currentImageName += letter;
+                currentBracketText += letter;
                 continue;
             }
+
+            if ((LastSymbol.Symbol == "![](" || LastSymbol.Symbol == "[](") && letter != ')')
+            {
+                currentParenthesisText += letter;
+                continue;
+            }
+
+            if ((LastSymbol.Symbol == "![]") && letter != '(')
+                ReplaceLatestSymbol(); //An image can exist without fallback text
 
             switch (letter)
             {
@@ -122,15 +135,20 @@ public class MarkdownToTMPConverter : MonoBehaviour
                     break;
                 case '[':
                     if (LastSymbol.Symbol == "!") LastSymbol.Symbol += "[";
-                    else convertedText.AppendToLatestStringInList("[");
+                    else markupSymbols.AddOrJoin(new MarkupSymbol("["));
                     break;
                 case ']':
-                    if (LastSymbol.Symbol == "![")
-                    {
+                    if (LastSymbol.Symbol == "![" || LastSymbol.Symbol == "[")
                         LastSymbol.Symbol += "]";
-                        ReplaceLatestSymbol();
-                    }
                     else convertedText.AppendToLatestStringInList("]");
+                    break;
+                case '(':
+                    if (LastSymbol.Symbol == "![]" || LastSymbol.Symbol == "[]") LastSymbol.Symbol += "(";
+                    else convertedText.AppendToLatestStringInList("(");
+                    break;
+                case ')':
+                    if (LastSymbol.Symbol == "![](" || LastSymbol.Symbol == "[](") LastSymbol.Symbol += ")";
+                    else convertedText.AppendToLatestStringInList(")");
                     break;
                 default:
                     ReplaceLatestSymbol();
@@ -186,10 +204,18 @@ public class MarkdownToTMPConverter : MonoBehaviour
             markupSymbols.Remove(LastSymbol);
         }
 
-        if (LastSymbol.Symbol == "![") //Image opener wasnt closed treat as literal
+        if (LastSymbol.Symbol == "![" || LastSymbol.Symbol == "[") //Image/Link bracket opener wasnt closed treat as literal
         {
-            convertedText.AppendToLatestStringInList($"![{currentImageName}");
-            currentImageName = string.Empty;
+            convertedText.AppendToLatestStringInList($"{LastSymbol.Symbol}{currentBracketText}");
+            currentBracketText = string.Empty;
+            markupSymbols.Remove(LastSymbol);
+        }
+
+        if (LastSymbol.Symbol == "![](" || LastSymbol.Symbol == "[](") //Image/Link paranthesis opener wasnt closed treat as literal
+        {
+            convertedText.AppendToLatestStringInList($"{(LastSymbol.Symbol.First() == '!' ? '!' : "")}[{currentBracketText}]({currentParenthesisText}");
+            currentBracketText = string.Empty;
+            currentParenthesisText = string.Empty;
             markupSymbols.Remove(LastSymbol);
         }
 
@@ -413,10 +439,31 @@ public class MarkdownToTMPConverter : MonoBehaviour
                 markupSymbols.Remove(mds);
                 break;
             case "![]":
-                convertedText.AppendToLatestStringInList($"<sprite=\"{currentImageName}\" index=0>");
-                currentImageName = string.Empty;
+            case "![]()":
+                TMP_SpriteAsset sprite = Resources.Load<TMP_SpriteAsset>($"Sprite Assets/{currentBracketText}");
+                if (sprite == null && currentParenthesisText != string.Empty) convertedText.AppendToLatestStringInList($"{currentParenthesisText}");
+                else convertedText.AppendToLatestStringInList($"<sprite=\"{currentBracketText}\" index=0>");
+                currentBracketText = string.Empty;
+                currentParenthesisText = string.Empty;
                 markupSymbols.Remove(mds);
                 break;
+            case "[]()":
+                convertedText.AppendToLatestStringInList($"<link=\"{currentParenthesisText}\"><color=#1E90FF><u>{currentBracketText}</u></color></link>");
+                currentBracketText = string.Empty;
+                currentParenthesisText = string.Empty;
+                markupSymbols.Remove(mds);
+                break;
+        }
+    }
+
+    public void OnPointerClick(PointerEventData eventData)
+    {
+        int linkIndex = TMP_TextUtilities.FindIntersectingLink(gameObject.GetComponent<TMP_Text>(), eventData.position, eventData.enterEventCamera);
+        if (linkIndex != -1)
+        {
+            var linkInfo = gameObject.GetComponent<TMP_Text>().textInfo.linkInfo[linkIndex];
+            string url = linkInfo.GetLinkID();
+            Application.OpenURL(url);
         }
     }
 }
