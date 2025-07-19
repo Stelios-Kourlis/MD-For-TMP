@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<test-run id="2" testcasecount="1" result="Failed(Child)" total="1" passed="0" failed="1" inconclusive="0" skipped="0" asserts="0" engine-version="3.5.0.0" clr-version="4.0.30319.42000" start-time="2025-07-19 15:58:00Z" end-time="2025-07-19 15:58:00Z" duration="0.1135861">
+  <test-suite type="TestSuite" id="1042" name="MD For TMP" fullname="MD For TMP" runstate="Runnable" testcasecount="31" result="Failed" site="Child" start-time="2025-07-19 15:58:00Z" end-time="2025-07-19 15:58:00Z" duration="0.113586" total="1" passed="0" failed="1" inconclusive="0" skipped="0" asserts="0">
+    <properties>
+      <property name="platform" value="PlayMode" />
+    </properties>
+    <failure>
+      <message><![CDATA[One or more child tests had errors]]></message>
+    </failure>
+    <test-suite type="Assembly" id="1038" name="Tests.dll" fullname="A:/Home/Game Related/Unity Projects/MD For TMP/Library/ScriptAssemblies/Tests.dll" runstate="Runnable" testcasecount="31" result="Failed" site="Child" start-time="2025-07-19 15:58:00Z" end-time="2025-07-19 15:58:00Z" duration="0.100122" total="1" passed="0" failed="1" inconclusive="0" skipped="0" asserts="0">
+      <properties>
+        <property name="_PID" value="39428" />
+        <property name="_APPDOMAIN" value="Unity Child Domain" />
+        <property name="platform" value="PlayMode" />
+        <property name="EditorOnly" value="False" />
+      </properties>
+      <failure>
+        <message><![CDATA[One or more child tests had errors]]></message>
+      </failure>
+      <test-suite type="TestFixture" id="1027" name="ImagesTests" fullname="ImagesTests" classname="ImagesTests" runstate="Runnable" testcasecount="1" result="Failed" site="Child" start-time="2025-07-19 15:58:00Z" end-time="2025-07-19 15:58:00Z" duration="0.096706" total="1" passed="0" failed="1" inconclusive="0" skipped="0" asserts="0">
+        <properties />
+        <failure>
+          <message><![CDATA[One or more child tests had errors]]></message>
+        </failure>
+        <test-case id="1028" name="TestImage" fullname="ImagesTests.TestImage" methodname="TestImage" classname="ImagesTests" runstate="Runnable" seed="465261287" result="Failed" start-time="2025-07-19 15:58:00Z" end-time="2025-07-19 15:58:00Z" duration="0.042048" asserts="0">
+          <properties>
+            <property name="_JOINTYPE" value="UnityCombinatorial" />
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+          <failure>
+            <message><![CDATA[  Image should be converted to sprite tag with index 0
+  Expected string length 44 but was 63. Strings differ at index 44.
+  Expected: "<sprite="TMP Markdown Support Icon" index=0>"
+  But was:  "<sprite="TMP Markdown Support Icon" index=0><sprite="" index=0>"
+  -------------------------------------------------------^
+]]></message>
+            <stack-trace><![CDATA[at ImagesTests+<TestImage>d__8.MoveNext () [0x0003d] in A:\Home\Game Related\Unity Projects\MD For TMP\Assets\Plugins\kstelakis\MarkdownForTMP\Tests\ImagesTests.cs:34
+at UnityEngine.TestTools.TestEnumerator+<Execute>d__7.MoveNext () [0x0003a] in .\Library\PackageCache\com.unity.test-framework@7056e7f856e9\UnityEngine.TestRunner\NUnitExtensions\Attributes\TestEnumerator.cs:44
+]]></stack-trace>
+          </failure>
+          <output><![CDATA[[Info] TMP_Text updated
+[Info] Line ended
+[Replacement] Replacing symbol: ![], IsOpener: True
+[Info] Line ended
+[Replacement] Replacing symbol: ![], IsOpener: True
+Saving results to: C:/Users/kstel/AppData/LocalLow/DefaultCompany/MD For TMP\TestResults.xml
+]]></output>
+        </test-case>
+      </test-suite>
+    </test-suite>
+  </test-suite>
+</test-run>
