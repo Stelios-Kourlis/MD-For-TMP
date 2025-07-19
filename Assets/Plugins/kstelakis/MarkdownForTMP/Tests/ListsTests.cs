@@ -4,39 +4,42 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.TestTools;
 
-public class ListsTests
+namespace kstelakis.MarkdownForTMP
 {
-    private static TMP_Text tmp;
-    private static GameObject go;
-
-    [OneTimeSetUp] // Runs once before all tests
-    public void Setup()
+    public class ListsTests
     {
-        go = new();
-        tmp = go.AddComponent<TextMeshProUGUI>();
-        go.AddComponent<MarkdownToTMPConverter>();
-        go.AddComponent<ConvertionLogger>();
-    }
+        private static TMP_Text tmp;
+        private static GameObject go;
 
-    [OneTimeTearDown]
-    public void Teardown()
-    {
-        Object.Destroy(go);
-    }
+        [OneTimeSetUp] // Runs once before all tests
+        public void Setup()
+        {
+            go = new();
+            tmp = go.AddComponent<TextMeshProUGUI>();
+            go.AddComponent<MarkdownFormatter>();
+            go.AddComponent<ConvertionLogger>();
+        }
 
-    [UnityTest]
-    public IEnumerator TestUnorderedListDashes()
-    {
-        tmp.text = "- Item 1\n- Item 2\n- Item 3";
-        yield return null;
-        Assert.AreEqual("• Item 1\n• Item 2\n• Item 3", tmp.text, "Unordered dash list should be converted to bullet points");
-    }
+        [OneTimeTearDown]
+        public void Teardown()
+        {
+            Object.Destroy(go);
+        }
 
-    [UnityTest]
-    public IEnumerator TestUnorderedListAsterisks()
-    {
-        tmp.text = "* Item 1\n* Item 2\n* Item 3";
-        yield return null;
-        Assert.AreEqual("• Item 1\n• Item 2\n• Item 3", tmp.text, "Unordered asterisk list should be converted to bullet points");
+        [UnityTest]
+        public IEnumerator TestUnorderedListDashes()
+        {
+            tmp.text = "- Item 1\n- Item 2\n- Item 3";
+            yield return null;
+            Assert.AreEqual("• Item 1\n• Item 2\n• Item 3", tmp.text, "Unordered dash list should be converted to bullet points");
+        }
+
+        [UnityTest]
+        public IEnumerator TestUnorderedListAsterisks()
+        {
+            tmp.text = "* Item 1\n* Item 2\n* Item 3";
+            yield return null;
+            Assert.AreEqual("• Item 1\n• Item 2\n• Item 3", tmp.text, "Unordered asterisk list should be converted to bullet points");
+        }
     }
 }

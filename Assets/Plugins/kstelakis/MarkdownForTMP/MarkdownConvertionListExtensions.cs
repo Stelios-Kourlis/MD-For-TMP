@@ -1,8 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
-using UnityEngine;
 
-internal static class MDListExtensions
+internal static class MarkdownConvertionListExtensions
 {
     /// <summary>
     /// Will try to get the last symbol in the list.
@@ -47,6 +46,11 @@ internal static class MDListExtensions
         return last.Symbol.Contains(symbol.Symbol) && !last.IsReplaced && last.Length >= maxRepeated;
     }
 
+    /// <summary>
+    /// In a list of string, append <paramref name="text"/> to the last string in the list.
+    /// <para>If the list is empty, add it the the list instead</para>
+    /// </summary>
+    /// <param name="text">The text to append</param>
     public static void AppendToLatestStringInList(this List<string> list, string text)
     {
         if (string.IsNullOrEmpty(text)) return;
@@ -63,6 +67,11 @@ internal static class MDListExtensions
         }
     }
 
+    /// <summary>
+    /// In a list of string, preend <paramref name="text"/> to the last string in the list. (Add it to the start of the last string)
+    /// <para>If the list is empty, add it the the list instead</para>
+    /// </summary>
+    /// <param name="text">The text to append</param>
     public static void PreendToLatestStringInList(this List<string> list, string text)
     {
         if (string.IsNullOrEmpty(text)) return;
@@ -79,8 +88,18 @@ internal static class MDListExtensions
         }
     }
 
+    /// <summary>
+    /// In a list of string, append <paramref name="character"/> to the last string in the list.
+    /// <para>If the list is empty, add it the the list instead</para>
+    /// </summary>
+    /// <param name="character">The character to append</param>
     public static void AppendToLatestStringInList(this List<string> list, char character) => AppendToLatestStringInList(list, character.ToString());
 
+    /// <summary>
+    /// In a list of string, preend <paramref name="text"/> to the last string in the list. (Add it to the start of the last string).
+    /// <para>If the list is empty, add it the the list instead</para>
+    /// </summary>
+    /// <param name="character">The character to append</param>
     public static void PreendToLatestStringInList(this List<string> list, char character) => PreendToLatestStringInList(list, character.ToString());
 
     public static bool LastLineIsOnlyOneTypeOfCharacter(this List<string> list, char character)
