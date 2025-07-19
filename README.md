@@ -22,9 +22,9 @@ The parser is based of the [Markdown Cheat Sheet](https://www.markdownguide.org/
 * Highlighted Text with \=\=
 * Subscript and Superscript with \~ and \^ respectivelly
 
-##Unique Syntax
+## Unique Syntax
 * Underline Text with \~\~\~
-* For images you can use ![image] without fall back text (Not recommended though)
+* For images you can use \!\[image\] without fall back text (Not recommended though)
 
 ## Unsupported Markdown
 * Horizontal Rules are not possible in TMP and therefore not supported
